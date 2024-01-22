@@ -131,7 +131,7 @@ export const resetPasswordLink = async (user, res) => {
   }
 };
 export const sendApprovalEmail = async (toEmail) => {
-  const loginLink = "http://localhost:3000/login";
+  const loginLink = "https://travelplanneronline.netlify.app/login";
 
   const mailOptions = {
     from: AUTH_EMAIL,
@@ -151,7 +151,7 @@ export const sendApprovalEmail = async (toEmail) => {
   }
 };
 export const sendRejectionEmail = async (toEmail, rejectionReason) => {
-  const reapplyLink = "http://localhost:3000/login";
+  const reapplyLink = "https://travelplanneronline.netlify.app/login";
   const mailOptions = {
     from: AUTH_EMAIL,
     to: toEmail,
