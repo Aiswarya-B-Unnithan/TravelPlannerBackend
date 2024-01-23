@@ -69,10 +69,10 @@ io.on("connection", (socket) => {
 
     //--------------------------------------------------->
     socket.on("send-msg", (data) => {
-      const sendUserSocket = onlineUsers.get(data.to);
+      const sendUserSocket = onlineUsers.get(data?.to);
  alert("sendUserSocket serrver: " + sendUserSocket);
       if (sendUserSocket) {
-        io.to(sendUserSocket).emit("msg-recieve", data.msg, data.to);
+        io.to(sendUserSocket).emit("msg-recieve", data?.msg, data.to);
       }
     });
     //--------------------------------------------------->
