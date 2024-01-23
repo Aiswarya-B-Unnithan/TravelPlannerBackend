@@ -20,7 +20,7 @@ const app = express();
 
 app.use(express.static(path.join(__dirname, "views/build")));
 
-const PORT = process.env.PORT || 8800;
+const PORT = process.env.PORT || 3000;
 
 dbConnection();
 
@@ -49,7 +49,7 @@ const server = app.listen(PORT);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://travelplanneronline.netlify.app/",
     credentials: true,
   },
 });

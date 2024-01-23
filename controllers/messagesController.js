@@ -96,7 +96,7 @@ export const addImgMsg = async (req, res) => {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
 
-  // Set the path to your desired folder
+
   const folderPath = path.join(__dirname, "../../client/", "public", "images");
 
   // Create the folder if it doesn't exist
@@ -115,8 +115,8 @@ export const addImgMsg = async (req, res) => {
 
   // Save the image
   fs.writeFileSync(imagePath, imageBuffer);
-
-  // Create a new Message document
+console.log("imagePath", imagePath);
+  // Create a ew Message document
   const newMessage = new Messages({
     message: {
       type: "image",
