@@ -30,7 +30,14 @@ app.use(cors());
 app.use(express.json({ limit: "30mb" }));
 app.use(express.urlencoded({ limit: "30mb", extended: true }));
 app.use("/public", express.static(path.join(__dirname, "public")));
+app.use((req, res, next) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://travelplanneronline.netlify.app"
+  );
 
+  next();
+});
 app.use(morgan("dev"));
 app.use(router);
 cloudinary.v2.config({
@@ -46,17 +53,10 @@ const onlineUsers = new Map();
 // app.use(errorMiddleware);
 
 const server = app.listen(PORT);
-app.use((req, res, next) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://travelplanneronline.netlify.app/"
-  );
-  
-  next();
-});
+
 const io = new Server(server, {
   cors: {
-    origin: "https://travelplanneronline.netlify.app/",
+    origin: "https://travelplanneronline.netlify.app",
     credentials: true,
   },
 });
