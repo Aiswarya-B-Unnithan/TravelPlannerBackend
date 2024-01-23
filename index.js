@@ -46,7 +46,14 @@ const onlineUsers = new Map();
 // app.use(errorMiddleware);
 
 const server = app.listen(PORT);
-
+app.use((req, res, next) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://travelplanneronline.netlify.app"
+  );
+  
+  next();
+});
 const io = new Server(server, {
   cors: {
     origin: "https://travelplanneronline.netlify.app/",
