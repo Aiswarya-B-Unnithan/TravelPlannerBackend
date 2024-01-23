@@ -49,7 +49,7 @@ const server = app.listen(PORT);
 
 const io = new Server(server, {
   cors: {
-    origin: "https://travelplanneronline.netlify.app/",
+    origin: "https://travelplanneronline.netlify.app",
     credentials: true,
   },
 });
