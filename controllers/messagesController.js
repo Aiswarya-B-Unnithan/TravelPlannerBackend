@@ -115,7 +115,7 @@ export const addImgMsg = async (req, res) => {
 
   // Save the image
   fs.writeFileSync(imagePath, imageBuffer);
-console.log("imagePath", imagePath);
+alert("imagepath",imagePath)
   // Create a ew Message document
   const newMessage = new Messages({
     message: {
