@@ -49,7 +49,7 @@ const server = app.listen(PORT);
 app.use((req, res, next) => {
   res.header(
     "Access-Control-Allow-Origin",
-    "https://travelplanneronline.netlify.app"
+    "https://travelplanneronline.netlify.app/"
   );
   
   next();
