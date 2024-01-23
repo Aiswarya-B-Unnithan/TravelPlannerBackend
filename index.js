@@ -63,7 +63,7 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   socket.on("add-user", (userId, chatId) => {
-    console.log("newuser is added to socket", userId);
+     alert("newuser is added to socket: " + userId);
     socket.join(chatId);
     const soketId = socket?.id;
     onlineUsers.set(userId, soketId);
@@ -72,7 +72,7 @@ io.on("connection", (socket) => {
     io.emit("update-online-status", onlineUsersArray);
     io.emit("getOnlineUsers", onlineUsersArray);
     io.emit("socket-setup", socket.id);
-    console.log("onlineusersfrom serrver", onlineUsersArray);
+    alert("onlineusersfrom serrver: " + onlineUsersArray);
 
     //--------------------------------------------------->
     socket.on("send-msg", (data) => {
