@@ -49,14 +49,14 @@ const server = app.listen(PORT);
 
 const io = new Server(server, {
   cors: {
-    origin: "https://travelplanneronline.netlify.app",
+    origin: "https://travelplanneronline.netlify.app/",
     credentials: true,
   },
 });
 
 io.on("connection", (socket) => {
   socket.on("add-user", (userId, chatId) => {
-      alert("newuser is added to socket: " + userId);
+    console.log("newuser is added to socket", userId);
     socket.join(chatId);
     const soketId = socket?.id;
     onlineUsers.set(userId, soketId);
@@ -65,14 +65,14 @@ io.on("connection", (socket) => {
     io.emit("update-online-status", onlineUsersArray);
     io.emit("getOnlineUsers", onlineUsersArray);
     io.emit("socket-setup", socket.id);
-    alert("onlineusersfrom serrver: " + onlineUsersArray);
+    console.log("onlineusersfrom serrver", onlineUsersArray);
 
     //--------------------------------------------------->
     socket.on("send-msg", (data) => {
-      const sendUserSocket = onlineUsers.get(data?.to);
- alert("sendUserSocket serrver: " + sendUserSocket);
+      const sendUserSocket = onlineUsers.get(data.to);
+
       if (sendUserSocket) {
-        io.to(sendUserSocket).emit("msg-recieve", data?.msg, data.to);
+        io.to(sendUserSocket).emit("msg-recieve", data.msg, data.to);
       }
     });
     //--------------------------------------------------->
