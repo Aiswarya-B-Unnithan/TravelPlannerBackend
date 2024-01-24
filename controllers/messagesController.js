@@ -210,50 +210,68 @@ export const filemsg = async (req, res) => {
 };
 
 export const voicemsg = async (req, res) => {
-  const audioBuffer = req.file.buffer;
-  const fromUserId = req.body.from;
-  const toUserId = req.body.to;
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
+  try {
+    const audioBuffer = req.file.buffer;
+    const fromUserId = req.body.from;
+    const toUserId = req.body.to;
 
-  // Set the path to your desired folder for voice recordings
-  const voiceFolderPath = path.join(
-    __dirname,
-    "../../client/public",
-    "voiceRecording"
-  );
+    // Upload the audio file to Cloudinary
+    const uploadResponse = await cloudinary.v2.uploader
+      .upload_stream(
+        {
+          resource_type: "auto",
+          public_id: `voice_${Date.now()}`,
+        },
+        async (error, result) => {
+          if (error) {
+            console.error("Error uploading audio to Cloudinary:", error);
+            res
+              .status(500)
+              .json({
+                success: false,
+                error: "Error uploading audio to Cloudinary",
+              });
+          } else {
+            const voiceUrl = result.url;
 
-  // Create the folder if it doesn't exist
-  if (!fs.existsSync(voiceFolderPath)) {
-    fs.mkdirSync(voiceFolderPath);
+            // Create a new Message document
+            const newMessage = new Messages({
+              message: {
+                type: "voice",
+                content: {
+                  voiceUrl: voiceUrl,
+                },
+              },
+              users: [fromUserId, toUserId],
+              sender: fromUserId,
+            });
+
+            // Save the new Message document to the database
+            try {
+              const savedMessage = await newMessage.save();
+
+              // Send response
+              res.json(savedMessage);
+            } catch (error) {
+              console.error("Error saving message to MongoDB:", error);
+              res
+                .status(500)
+                .json({
+                  success: false,
+                  error: "Error saving message to MongoDB",
+                });
+            }
+          }
+        }
+      )
+      .end(audioBuffer);
+  } catch (error) {
+    console.error("Error handling audio:", error);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
-
-  // Generate a unique filename for the voice recording
-  const fileName = `voice_${Date.now()}.wav`;
-
-  // Set the complete path for saving the voice recording
-  const voiceFilePath = path.join(voiceFolderPath, fileName);
-
-  // Save the voice recording
-  fs.writeFileSync(voiceFilePath, audioBuffer);
-
-  // Create a new Message document
-  const newMessage = new Messages({
-    message: {
-      type: "voice",
-      content: {
-        voiceUrl: voiceFilePath,
-      },
-    },
-    users: [fromUserId, toUserId],
-    sender: fromUserId,
-  });
-
-  // Save the new Message document to the database
-  const savedMessage = await newMessage.save();
-
-  res.status(200).json(savedMessage);
 };
+
+
 
 export const videomsg = async (req, res) => {
   try {
@@ -261,55 +279,62 @@ export const videomsg = async (req, res) => {
     const fromUserId = req.body.from;
     const toUserId = req.body.to;
 
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-
-    // Set the path to your desired folder
-    const folderPath = path.join(
-      __dirname,
-      "../../client/",
-      "public",
-      "videos"
-    );
-
-    // Create the folder if it doesn't exist
-    if (!fs.existsSync(folderPath)) {
-      fs.mkdirSync(folderPath);
-    }
-
-    // Use the original file extension
-    const fileExtension = req.file.originalname.split(".").pop();
-
-    // Generate a unique filename for the video
-    const fileName = `video_${Date.now()}.${fileExtension}`;
-
-    // Set the complete path for saving the video
-    const videoPath = path.join(folderPath, fileName);
-
-    // Save the video asynchronously
-    await fs.promises.writeFile(videoPath, videoBuffer);
-
-    // Create a new Message document
-    const newMessage = new Messages({
-      message: {
-        type: "video",
-        content: {
-          videoUrl: videoPath,
+    // Upload the video file to Cloudinary
+    cloudinary.v2.uploader
+      .upload_stream(
+        {
+          resource_type: "video",
+          public_id: `video_${Date.now()}`,
         },
-      },
-      users: [fromUserId, toUserId],
-      sender: fromUserId,
-    });
+        async (error, result) => {
+          if (error) {
+            console.error("Error uploading video to Cloudinary:", error);
+            return res
+              .status(500)
+              .json({
+                success: false,
+                error: "Error uploading video to Cloudinary",
+              });
+          }
 
-    const savedMessage = await newMessage.save();
+          const videoUrl = result.secure_url; // Use secure_url instead of url
 
-    // Send response
-    res.json({ success: true });
+          // Create a new Message document
+          const newMessage = new Messages({
+            message: {
+              type: "video",
+              content: {
+                videoUrl: videoUrl,
+              },
+            },
+            users: [fromUserId, toUserId],
+            sender: fromUserId,
+          });
+
+          // Save the new Message document to the database
+          try {
+            const savedMessage = await newMessage.save();
+
+            // Send response
+            res.json({ success: true });
+          } catch (error) {
+            console.error("Error saving message to MongoDB:", error);
+            res
+              .status(500)
+              .json({
+                success: false,
+                error: "Error saving message to MongoDB",
+              });
+          }
+        }
+      )
+      .end(videoBuffer);
   } catch (error) {
     console.error("Error handling video:", error);
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
+
 export const markAsRead = async (req, res) => {
   const { chatId } = req.query;
 
