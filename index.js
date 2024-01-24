@@ -73,10 +73,11 @@ io.on("connection", (socket) => {
     io.emit("getOnlineUsers", onlineUsersArray);
     io.emit("socket-setup", socket.id);
    
-
+console.log("onlineUsers", onlineUsersArray);
     //--------------------------------------------------->
     socket.on("send-msg", (data) => {
       const sendUserSocket = onlineUsers.get(data.to);
+console.log("sendUserSocket", sendUserSocket);
 
       if (sendUserSocket) {
         console.log("sendUserSocket",sendUserSocket)
