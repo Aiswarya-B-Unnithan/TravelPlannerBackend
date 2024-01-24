@@ -79,9 +79,13 @@ console.log("onlineUsers", onlineUsersArray);
       const sendUserSocket = onlineUsers.get(data.to);
       console.log("sendUserSocket", sendUserSocket);
 
+      // if (sendUserSocket) {
+      //   console.log("sendUserSocket",sendUserSocket)
+      //   io.to(sendUserSocket).emit("msg-recieve", data.msg, data.to);
+      // }
       if (sendUserSocket) {
         console.log("sendUserSocket",sendUserSocket)
-        io.to(sendUserSocket).emit("msg-recieve", data.msg, data.to);
+        socket.broadcast.emit("msg-recieve", data.msg, data.to);
       }
     });
     //--------------------------------------------------->
