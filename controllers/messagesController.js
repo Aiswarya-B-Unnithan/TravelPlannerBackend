@@ -152,41 +152,57 @@ export const filemsg = async (req, res) => {
     const fileBuffer = req.file.buffer;
     const fromUserId = req.body.from;
     const toUserId = req.body.to;
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
 
-    // Set the path to your desired folder
-    const folderPath = path.join(__dirname, "../../client/public", "files");
-
-    // Create the folder if it doesn't exist
-    if (!fs.existsSync(folderPath)) {
-      fs.mkdirSync(folderPath);
-    }
-    const mimeType = mime.lookup(req.file.originalname);
-    const fileExtension = mime.extension(mimeType);
-    const uniqueFilename = `${uuidv4()}.${fileExtension}`;
-    const filePath = path.join(folderPath, uniqueFilename);
-
-    // Save the file
-    fs.writeFileSync(filePath, fileBuffer);
-
-    // Create a new Message document
-    const newMessage = new Messages({
-      message: {
-        type: "file",
-        content: {
-          fileUrl: `/files/${uniqueFilename}`, // URL based on the unique filename
+    // Upload the file to Cloudinary
+    const uploadResponse = await cloudinary.v2.uploader
+      .upload_stream(
+        {
+          resource_type: "raw",
+          public_id: `file_${uuidv4()}`,
         },
-      },
-      users: [fromUserId, toUserId],
-      sender: fromUserId,
-    });
+        async (error, result) => {
+          if (error) {
+            console.error("Error uploading file to Cloudinary:", error);
+            res
+              .status(500)
+              .json({
+                success: false,
+                error: "Error uploading file to Cloudinary",
+              });
+          } else {
+            const fileUrl = result.url;
 
-    // Save the new Message document to the database
-    await newMessage.save();
+            // Create a new Message document
+            const newMessage = new Messages({
+              message: {
+                type: "file",
+                content: {
+                  fileUrl: fileUrl,
+                },
+              },
+              users: [fromUserId, toUserId],
+              sender: fromUserId,
+            });
 
-    // Send response
-    res.json({ success: true });
+            // Save the new Message document to the database
+            try {
+              await newMessage.save();
+
+              // Send response
+              res.json({ success: true });
+            } catch (error) {
+              console.error("Error saving message to MongoDB:", error);
+              res
+                .status(500)
+                .json({
+                  success: false,
+                  error: "Error saving message to MongoDB",
+                });
+            }
+          }
+        }
+      )
+      .end(fileBuffer);
   } catch (error) {
     console.error("Error handling file:", error);
     res.status(500).json({ success: false, error: "Internal Server Error" });
