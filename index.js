@@ -75,13 +75,13 @@ io.on("connection", (socket) => {
    console.log("getOnlineUsers", onlineUsersArray);
 
     //--------------------------------------------------->
-    socket.on("send-msg", (data) => {
-      const sendUserSocket = onlineUsers.get(data.to);
-     console.log("sendUserSocket", sendUserSocket);
-      if (sendUserSocket) {
-        io.to(sendUserSocket).emit("msg-recieve", data?.msg, data.to);
-      }
-    });
+    // socket.on("send-msg", (data) => {
+    //   const sendUserSocket = onlineUsers.get(data.to);
+    //  console.log("sendUserSocket", sendUserSocket);
+    //   if (sendUserSocket) {
+    //     socket.to(sendUserSocket).emit("msg-recieve", data?.msg, data.to);
+    //   }
+    // });
     //--------------------------------------------------->
     socket.on("mark-as-read", ({ senderId, userId }) => {
       // Emit an event to inform other clients that the message is read
@@ -92,6 +92,13 @@ io.on("connection", (socket) => {
   socket.on("post-like", (likeDetails) => {
     // Broadcast the event to all connected clients
     socket.broadcast.emit("new-like-event", likeDetails);
+  });
+  socket.on("send-msg", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    console.log("sendUserSocket", sendUserSocket);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("msg-recieve", data?.msg, data.to);
+    }
   });
   socket.on("event-created", (eventDetails) => {
     // Broadcast the event to all connected clients
@@ -111,8 +118,8 @@ io.on("connection", (socket) => {
     onlineUsers.delete(userId);
     const onlineUsersArray = Array.from(onlineUsers.keys());
     socket.emit("update-online-status", onlineUsersArray);
-    // console.log("user is disconnected");
-    // console.log(`Socket ${socket.id} disconnected`);
+    console.log("user is disconnected");
+    console.log(`Socket ${socket.id} disconnected`);
   });
 });
 
