@@ -94,49 +94,58 @@ export const addImgMsg = async (req, res) => {
   const fromUserId = req.body.from;
   const toUserId = req.body.to;
 
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-
-
-  const folderPath = path.join(__dirname, "../../client/", "public", "images");
-
-  // Create the folder if it doesn't exist
-  if (!fs.existsSync(folderPath)) {
-    fs.mkdirSync(folderPath);
-  }
-
-  // Use the original file extension
-  const fileExtension = req.file.originalname.split(".").pop();
-
-  // Generate a unique filename for the image
-  const fileName = `image_${Date.now()}.${fileExtension}`;
-
-  // Set the complete path for saving the image
-  const imagePath = path.join(folderPath, fileName);
-
-  // Save the image
-  fs.writeFileSync(imagePath, imageBuffer);
-alert("imagepath",imagePath)
-const uploadResponse = await cloudinary.v2.uploader.upload(imagePath);
-let imageUrl = uploadResponse.url;
-  // Create a new Message document
-  const newMessage = new Messages({
-    message: {
-      type: "image",
-      content: {
-        imageUrl: imageUrl,
+  // Upload the image to Cloudinary
+  const uploadResponse = await cloudinary.v2.uploader
+    .upload_stream(
+      {
+        resource_type: "image",
+        public_id: `image_${Date.now()}`,
+        format: "jpg",
       },
-    },
-  
-    users: [fromUserId, toUserId],
-    sender: fromUserId,
-  });
+      async (error, result) => {
+        if (error) {
+          console.error("Error uploading image to Cloudinary:", error);
+          res
+            .status(500)
+            .json({
+              success: false,
+              error: "Error uploading image to Cloudinary",
+            });
+        } else {
+          const imageUrl = result.url;
 
-  // Save the new Message document to the database
-  const savedMessage = await newMessage.save();
+          // Create a new Message document
+          const newMessage = new Messages({
+            message: {
+              type: "image",
+              content: {
+                imageUrl: imageUrl,
+              },
+            },
+            users: [fromUserId, toUserId],
+            sender: fromUserId,
+          });
 
-  // Send response
-  res.json({ success: true });
+          // Save the new Message document to the database
+          try {
+            const savedMessage = await newMessage.save();
+            console.log("savedmsg", savedMessage);
+
+            // Send response
+            res.json({ success: true });
+          } catch (error) {
+            console.error("Error saving message to MongoDB:", error);
+            res
+              .status(500)
+              .json({
+                success: false,
+                error: "Error saving message to MongoDB",
+              });
+          }
+        }
+      }
+    )
+    .end(imageBuffer);
 };
 export const filemsg = async (req, res) => {
   try {
@@ -147,7 +156,7 @@ export const filemsg = async (req, res) => {
     const __dirname = path.dirname(__filename);
 
     // Set the path to your desired folder
-    const folderPath = path.join(__dirname, "../../server/public", "files");
+    const folderPath = path.join(__dirname, "../../client/public", "files");
 
     // Create the folder if it doesn't exist
     if (!fs.existsSync(folderPath)) {
