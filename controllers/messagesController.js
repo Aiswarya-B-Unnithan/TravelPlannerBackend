@@ -147,7 +147,7 @@ export const filemsg = async (req, res) => {
     const __dirname = path.dirname(__filename);
 
     // Set the path to your desired folder
-    const folderPath = path.join(__dirname, "../../client/public", "files");
+    const folderPath = path.join(__dirname, "../../server/public", "files");
 
     // Create the folder if it doesn't exist
     if (!fs.existsSync(folderPath)) {
