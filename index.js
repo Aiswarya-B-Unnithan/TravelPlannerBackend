@@ -69,9 +69,9 @@ io.on("connection", (socket) => {
     onlineUsers.set(userId, soketId);
 
     const onlineUsersArray = Array.from(onlineUsers.keys());
-    io.emit("update-online-status", onlineUsersArray);
-    io.emit("getOnlineUsers", onlineUsersArray);
-    io.emit("socket-setup", socket.id);
+    socket.emit("update-online-status", onlineUsersArray);
+    socket.emit("getOnlineUsers", onlineUsersArray);
+    socket.emit("socket-setup", socket.id);
    
 console.log("onlineUsers", onlineUsersArray);
     //--------------------------------------------------->
