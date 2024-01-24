@@ -63,43 +63,36 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   socket.on("add-user", (userId, chatId) => {
-   console.log("add-userrt", userId);
+   
     socket.join(chatId);
     const soketId = socket?.id;
     onlineUsers.set(userId, soketId);
 
     const onlineUsersArray = Array.from(onlineUsers.keys());
-    socket.emit("update-online-status", onlineUsersArray);
-    socket.emit("getOnlineUsers", onlineUsersArray);
-    socket.emit("socket-setup", socket.id);
-   console.log("getOnlineUsers", onlineUsersArray);
+    io.emit("update-online-status", onlineUsersArray);
+    io.emit("getOnlineUsers", onlineUsersArray);
+    io.emit("socket-setup", socket.id);
+   
 
     //--------------------------------------------------->
-    // socket.on("send-msg", (data) => {
-    //   const sendUserSocket = onlineUsers.get(data.to);
-    //  console.log("sendUserSocket", sendUserSocket);
-    //   if (sendUserSocket) {
-    //     socket.to(sendUserSocket).emit("msg-recieve", data?.msg, data.to);
-    //   }
-    // });
+    socket.on("send-msg", (data) => {
+      const sendUserSocket = onlineUsers.get(data.to);
+
+      if (sendUserSocket) {
+        console.log("sendUserSocket",sendUserSocket)
+        io.to(sendUserSocket).emit("msg-recieve", data.msg, data.to);
+      }
+    });
     //--------------------------------------------------->
     socket.on("mark-as-read", ({ senderId, userId }) => {
       // Emit an event to inform other clients that the message is read
-      socket.emit("new-message", { senderId });
+      io.emit("new-message", { senderId });
     });
     //--------------------------------------------------->
   });
   socket.on("post-like", (likeDetails) => {
     // Broadcast the event to all connected clients
     socket.broadcast.emit("new-like-event", likeDetails);
-  });
-  socket.on("send-msg", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to);
-    console.log("sendUserSocket", sendUserSocket);
-    if (sendUserSocket) {
-      console.log("msg",data?.msg)
-      socket.to(sendUserSocket).emit("msg-recieve", data?.msg, data.to);
-    }
   });
   socket.on("event-created", (eventDetails) => {
     // Broadcast the event to all connected clients
@@ -118,7 +111,7 @@ io.on("connection", (socket) => {
     const userId = getUserIdBySocketId(socket.id);
     onlineUsers.delete(userId);
     const onlineUsersArray = Array.from(onlineUsers.keys());
-    socket.emit("update-online-status", onlineUsersArray);
+    io.emit("update-online-status", onlineUsersArray);
     console.log("user is disconnected");
     console.log(`Socket ${socket.id} disconnected`);
   });
