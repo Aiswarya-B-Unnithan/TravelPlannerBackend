@@ -569,6 +569,7 @@ export const reportRoom = async (req, res) => {
 };
 export const reportTraveler = async (req, res) => {
   const { reportedUser, reason } = req.body;
+  console.log("reporting", reportedUser, reason);
   const reportingUser = req.body.user.userId;
 
 
