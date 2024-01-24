@@ -57,7 +57,7 @@ const server = app.listen(PORT);
 const io = new Server(server, {
   cors: {
     origin: "https://travelplanneronline.netlify.app",
-    credentials: true,
+    
   },
 });
 
@@ -77,7 +77,7 @@ console.log("onlineUsers", onlineUsersArray);
     //--------------------------------------------------->
     socket.on("send-msg", (data) => {
       const sendUserSocket = onlineUsers.get(data.to);
-console.log("sendUserSocket", sendUserSocket);
+      console.log("sendUserSocket", sendUserSocket);
 
       if (sendUserSocket) {
         console.log("sendUserSocket",sendUserSocket)
