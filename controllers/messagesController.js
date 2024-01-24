@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { v4 as uuidv4 } from "uuid";
 import mime from "mime-types";
+import cloudinary from "cloudinary";
 export const getMessages = async (req, res, next) => {
   try {
     const { from, to } = req.query;
@@ -116,14 +117,17 @@ export const addImgMsg = async (req, res) => {
   // Save the image
   fs.writeFileSync(imagePath, imageBuffer);
 alert("imagepath",imagePath)
-  // Create a ew Message document
+const uploadResponse = await cloudinary.v2.uploader.upload(imagePath);
+let imageUrl = uploadResponse.url;
+  // Create a new Message document
   const newMessage = new Messages({
     message: {
       type: "image",
       content: {
-        imageUrl: imagePath,
+        imageUrl: imageUrl,
       },
     },
+  
     users: [fromUserId, toUserId],
     sender: fromUserId,
   });
