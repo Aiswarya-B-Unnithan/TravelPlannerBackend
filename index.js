@@ -63,7 +63,7 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   socket.on("add-user", (userId, chatId) => {
-   
+   console.log("add-userrt", userId);
     socket.join(chatId);
     const soketId = socket?.id;
     onlineUsers.set(userId, soketId);
@@ -72,7 +72,7 @@ io.on("connection", (socket) => {
     io.emit("update-online-status", onlineUsersArray);
     io.emit("getOnlineUsers", onlineUsersArray);
     io.emit("socket-setup", socket.id);
-   
+  
 
     //--------------------------------------------------->
     socket.on("send-msg", (data) => {
@@ -111,8 +111,8 @@ io.on("connection", (socket) => {
     onlineUsers.delete(userId);
     const onlineUsersArray = Array.from(onlineUsers.keys());
     io.emit("update-online-status", onlineUsersArray);
-    console.log("user is disconnected");
-    console.log(`Socket ${socket.id} disconnected`);
+    // console.log("user is disconnected");
+    // console.log(`Socket ${socket.id} disconnected`);
   });
 });
 
