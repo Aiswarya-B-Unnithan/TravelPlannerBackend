@@ -69,9 +69,9 @@ io.on("connection", (socket) => {
     onlineUsers.set(userId, soketId);
 
     const onlineUsersArray = Array.from(onlineUsers.keys());
-    socket.emit("update-online-status", onlineUsersArray);
-    socket.emit("getOnlineUsers", onlineUsersArray);
-    socket.emit("socket-setup", socket.id);
+    io.emit("update-online-status", onlineUsersArray);
+    io.emit("getOnlineUsers", onlineUsersArray);
+    io.emit("socket-setup", socket.id);
    
 console.log("onlineUsers", onlineUsersArray);
     //--------------------------------------------------->
@@ -79,13 +79,9 @@ console.log("onlineUsers", onlineUsersArray);
       const sendUserSocket = onlineUsers.get(data.to);
       console.log("sendUserSocket", sendUserSocket);
 
-      // if (sendUserSocket) {
-      //   console.log("sendUserSocket",sendUserSocket)
-      //   io.to(sendUserSocket).emit("msg-recieve", data.msg, data.to);
-      // }
       if (sendUserSocket) {
         console.log("sendUserSocket",sendUserSocket)
-        socket.broadcast.emit("msg-recieve", data.msg, data.to);
+        io.to(sendUserSocket).emit("msg-recieve", data.msg, data.to);
       }
     });
     //--------------------------------------------------->
