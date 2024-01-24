@@ -72,7 +72,7 @@ io.on("connection", (socket) => {
     io.emit("update-online-status", onlineUsersArray);
     io.emit("getOnlineUsers", onlineUsersArray);
     io.emit("socket-setup", socket.id);
-   console.log("getOnlineUsers", getOnlineUsers);
+   console.log("getOnlineUsers", onlineUsersArray);
 
     //--------------------------------------------------->
     socket.on("send-msg", (data) => {
