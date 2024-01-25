@@ -21,7 +21,7 @@ export const sendVerificationEmail = async (user, res) => {
 
   const token = _id + uuidv4();
 
-  const link = APP_URL + "users/verify/" + _id + "/" + token;
+  const link = "https://tplanner.online/" + "users/verify/" + _id + "/" + token;
 
   //   mail options
   const mailOptions = {
@@ -44,7 +44,7 @@ export const sendVerificationEmail = async (user, res) => {
     </p>
     <div style="margin-top: 20px;">
         <h5>Best Regards</h5>
-        <h5>ShareFun Team</h5>
+        <h5>TarvelPlanner Team</h5>
     </div>
 </div>`,
   };

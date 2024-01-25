@@ -10,11 +10,13 @@ import {
 import ReportedRoom from "../../models/reportedRooms.js";
 
 export const getHostUsers = tryCatch(async (req, res) => {
-
-  const hostUsers = await Users.find().sort({ _id: -1 });
+  const hostUsers = await Users.find({ role: { $ne: "Admin" } }).sort({
+    _id: -1,
+  });
 
   res.status(200).json({ success: true, result: hostUsers });
 });
+
 export const fetchRequests = tryCatch(async (req, res) => {
   try {
     const requests = await Users.find({
