@@ -28,8 +28,8 @@ export const createRoom = tryCatch(async (req, res) => {
 });
 
 export const getRooms = tryCatch(async (req, res) => {
-  const rooms = await Room.find({ isBlock: false, isDelete: false }).sort({
-    _id: -1,
+  const rooms = await Room.find({ isDelete: false, isBlock: false }).sort({
+    
   });
   res.status(200).json({ success: true, result: rooms });
 });
