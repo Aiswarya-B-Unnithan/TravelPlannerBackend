@@ -21,6 +21,7 @@ import {
   getNotification,
   markAsRead,
   reportTraveler,
+  checkFriendRequestStatus,
 } from "../controllers/userController.js";
 import userAuth from "../middleware/authMiddleware.js";
 
