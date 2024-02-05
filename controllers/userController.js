@@ -527,6 +527,50 @@ export const makeUnfriend = async (req, res, next) => {
     });
   }
 };
+export const checkFriendRequestStatus = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const loggedInUserId = req.body.user.userId;
+    // Check if there is a friend request from the logged-in user to the viewed user
+    const friendRequest = await FriendRequest.findOne({
+      requestTo: userId,
+      requestFrom: loggedInUserId,
+      requestStatus: "Pending",
+    });
+
+    // Check if the users are already friends
+    const areFriends = await Users.exists({
+      _id: userId,
+      friends: loggedInUserId,
+    });
+
+    if (friendRequest) {
+      // Friend request already sent
+      return res.status(200).json({
+        status: true,
+        requestStatus: "Pending",
+      });
+    } else if (areFriends) {
+      // Users are already friends
+      return res.status(200).json({
+        status: true,
+        requestStatus: "Accepted",
+      });
+    } else {
+      // No friend request sent
+      return res.status(200).json({
+        status: true,
+        requestStatus: "NotSent",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: false,
+      message: "Internal Server Error",
+    });
+  }
+};
 
 export const profileUpdate = async (req, res) => {
   console.log("update host profile");

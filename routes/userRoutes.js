@@ -40,6 +40,7 @@ router.put("/update-user", updateUser);
 // friend request
 router.post("/friend-request", userAuth, friendRequest);
 router.post("/get-friend-request", userAuth, getFriendRequest);
+router.post("/checkFriendRequestStatus", userAuth, checkFriendRequestStatus);
 
 // accept / deny friend request
 router.post("/accept-request", userAuth, acceptRequest);
